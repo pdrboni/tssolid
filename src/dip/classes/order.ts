@@ -1,15 +1,16 @@
 import { OrderStatus } from "./interfaces/orderStatus";
-import { ShoppingCart } from "./shoppingCart";
-import { Messaging } from "../services/messaging";
-import { Persistency } from "../services/persistency";
 import { CustomerOrder } from "./interfaces/customerProtocol";
+import { ShoppingCartProtocol } from "./interfaces/shoppingCartProtocol";
+import { MessagingProtocol } from "./interfaces/messagingProtocol";
+import { PersistencyProtocol } from "./interfaces/persistencyProtocol";
 
 export class Order {
   private _orderStatus: OrderStatus = 'open';
 
   constructor(
-    private readonly cart: ShoppingCart,
-    private readonly persistency: Persistency,
+    private readonly cart: ShoppingCartProtocol,
+    private readonly messaging: MessagingProtocol,
+    private readonly persistency: PersistencyProtocol,
     private readonly customer: CustomerOrder,
   ) {}
 
@@ -24,7 +25,7 @@ export class Order {
       return;
     }
 
-    Messaging.sendMessage(`Your order cost ${this.cart.totalWithDiscount()} and was recieved`);
+    this.messaging.sendMessage(`Your order cost ${this.cart.totalWithDiscount()} and was recieved`);
     this.persistency.saveOrder();
     this.cart.clear();
     this._orderStatus = 'closed';
